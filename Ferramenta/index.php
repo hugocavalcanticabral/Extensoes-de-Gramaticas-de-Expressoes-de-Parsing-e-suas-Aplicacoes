@@ -32,10 +32,10 @@
 		</div>
 		
 		<div class="container">
-			<form action="login.php" method="post">
+			<form action="login.php" method="POST">
 				<div class="form-group row">
 					<label for="matricula" class="col-form-label">Matricula:</label>
-					<input type="number" class="form-control" id="matricula" aria-describedby="emailHelp" placeholder="Digite sua matricula">
+					<input required type="number" class="form-control" name="matricula" aria-describedby="emailHelp" placeholder="Digite sua matricula">
 				</div>
 				<div class="form-group row">
 					<button type="submit" class="btn btn-primary">Submit</button>

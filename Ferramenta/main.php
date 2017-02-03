@@ -1,3 +1,6 @@
+<?php
+	session_start();
+?>
 <!DOCTYPE html>
 <html>
 	<head>
@@ -47,7 +50,7 @@
 					load_code(codigos[codigo_atual]);
 				});
 			});
-		</script>
+		</script>		
 	</head>
 	<body>
 		
@@ -89,7 +92,7 @@
 				data = data.replace(new RegExp('<', 'g'), "&lt;");
 				data = data.replace(new RegExp('>', 'g'), "&gt;");
 				
-				document.getElementById('codigo').innerHTML = "<pre id='editor' style='font-size:15px'>" + data + " </pre>";
+				document.getElementById('codigo').innerHTML = "<pre id='editor' style='font-size:15px' >" + data + " </pre>";
 			})
 				
 			.always(function() {
@@ -105,31 +108,58 @@
 				document.getElementById("botao").click();
 		});
 		
+		function processar(texto){
+			var aux = texto.split('\n');
+			var achado = false;
+			var saida = "";
+			
+			for(var lin in aux){
+				if(aux[lin].indexOf('#') != -1 || achado == true){
+					if(achado == true)
+						saida = saida + "\n" + aux[lin];
+					else 
+						saida = saida + aux[lin];
+					achado = true;
+				}
+			}
+			
+			console.log(saida);
+			return saida;
+		}
+		
 		$(function() {
 			$('#botao').click(function(){
-				var teste = $( "#editor" ).text();
 				$.ajax({
-						url: 'pro.php',   // link your page
+						url: '<?php echo ($_SESSION["matricula"]);?>' + '\\submit.php',   // link your page
 						type: 'POST',
 						data: {
-							'teste': $( "#editor" ).text(),
-							// 'key2': data2
-							//if you want to post somethig 
+							'file': processar(document.getElementById("editor").innerText),
+							'question':codigo_atual
+						},
+						beforeSend: function(){
+							$('#logDeSaida').html("");
 						},
 						success: function(data) {
 						   // got success data
-						   alert('Compilado com sucesso');
+						   //alert(data);
+						   //alert('Compilado com sucesso');
+						   if(!data) document.getElementById("proximo").click();
+							   
+						   $('#logDeSaida').html(data);
 						   //$('#var').html(data);   // set value in the div
 						},
-						error: function(data) {
+						error: function(xhr, status, error) {
 						   // if error occure
-							alert('Some Error Occurred. Please Try Later.');
+							//var err = JSON.parse(xhr.responseText);
+							alert('Opa, algo deu errado, favor tentar novamente mais tarde.');
 						}
 					});
 			})
 			$('#proximo').click(function(){
-				if((codigo_atual+1) == codigos.length)
+				if((codigo_atual+1) == codigos.length){
 					alert("Parabéns, você já concluiu as atividades");
+					window.location = "index.php";
+				}
 				else{
 					codigo_atual = codigo_atual + 1
 					load_code(codigos[codigo_atual]);
